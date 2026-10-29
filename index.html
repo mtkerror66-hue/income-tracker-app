@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#142238"><title>Income Tracker Secure</title>
+<style>
+:root{--navy:#142238;--blue:#2f6fed;--bg:#f3f6fb;--line:#e1e8f2;--muted:#68768c;--green:#13845b;--red:#c83e52}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172338;font-family:system-ui,-apple-system,"Noto Sans Myanmar",sans-serif}header{background:var(--navy);color:#fff;padding:20px 16px}header .inner,main{max-width:900px;margin:auto}h1{font-size:22px;margin:0 0 4px}header p{margin:0;color:#d5deec;font-size:13px}.inner{padding:0 12px}main{padding:18px 12px 36px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px #14223808}.hidden{display:none!important}h2{font-size:18px;margin:0 0 12px}.muted,.note{color:var(--muted);font-size:13px;line-height:1.6}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}label{font-size:13px;color:var(--muted);font-weight:700}input,select{width:100%;padding:12px;border:1px solid #d5deeb;border-radius:10px;font:inherit;background:#fff;color:#172338}.btn{border:0;border-radius:10px;padding:12px 15px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#fff;border:1px solid var(--line);color:#172338}.danger{background:#fff0f2;color:var(--red);border:1px solid #ffd6dc}.btn:disabled{opacity:.55}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.metric{border:1px solid var(--line);border-radius:12px;padding:12px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:19px;margin-top:7px;overflow-wrap:anywhere}.green{color:var(--green)}.red{color:var(--red)}.status{padding:10px 12px;border-radius:10px;background:#edf3ff;color:#244f9d;margin:10px 0;font-size:14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:540px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted)}td:last-child,th:last-child{text-align:right}.tag{font-size:12px;font-weight:750;border-radius:20px;padding:4px 8px;background:#e8f1ff;color:#2459b4}.tag.ok{background:#e1f6ec;color:var(--green)}.tag.no{background:#ffeaed;color:var(--red)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tabs button{flex:1}.msg{margin:10px 0;font-size:14px;white-space:pre-wrap}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;display:none;max-width:90%;z-index:9}.small{font-size:12px}.nowrap{white-space:nowrap}
+@media(max-width:620px){.grid{grid-template-columns:1fr}.row>*{min-width:100%}.tabs{display:grid;grid-template-columns:1fr 1fr}h1{font-size:20px}.card{padding:13px}}
+</style>
+</head>
+<body>
+<header><div class="inner"><h1>🔐 Income Tracker</h1><p>Admin ခွင့်ပြုချက်ဖြင့်သာ အသုံးပြုနိုင်သော ဝင်ငွေစာရင်း</p></div></header>
+<main>
+<section id="setup" class="card">
+<h2>စတင်အသုံးပြုရန် ပြင်ဆင်ခြင်း</h2>
+<p class="note">အောက်ပါ Project URL နဲ့ Publishable/anon key ကို Supabase Dashboard မှာ ရယူပြီး ထည့်ပါ။ ဒီတန်ဖိုးတွေကို ဒီဘရောက်ဇာထဲမှာပဲ မှတ်ထားမယ်။ Secret/service_role key ကို ဘယ်တော့မှ မထည့်ပါနဲ့။</p>
+<div class="field"><label for="projectUrl">Supabase Project URL</label><input id="projectUrl" placeholder="https://xxxxxxxx.supabase.co" autocomplete="url"></div>
+<div class="field"><label for="publicKey">Publishable key (သို့) anon public key</label><input id="publicKey" placeholder="sb_publishable_... / anon key" autocomplete="off"></div>
+<div class="row"><button class="btn primary" id="saveConfig">ချိတ်ဆက်မယ်</button><button class="btn secondary" id="clearConfig">ပြန်ရှင်းမယ်</button></div>
+<p class="note">Project ကို တစ်ကြိမ်ပြင်ဆင်ပြီးလျှင် ဒီ Browser က မှတ်ထားပါမယ်။</p>
+</section>
+<section id="auth" class="card hidden">
+<h2>Email နဲ့ ဝင်ရန် / အကောင့်ဖွင့်ရန်</h2>
+<p class="note">Email လိပ်စာနဲ့ Password သုံးပါ။ အကောင့်အသစ်ဖွင့်ပြီးနောက် Admin က ခွင့်ပြုမှ စာရင်းသုံးနိုင်ပါမယ်။ Email အတည်ပြုရန် တောင်းလာပါက Inbox ကိုစစ်ပါ။</p>
+<div class="field"><label for="email">Email လိပ်စာ</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+<div class="field"><label for="password">Password (အနည်းဆုံး 6 လုံး)</label><input id="password" type="password" minlength="6" autocomplete="current-password" placeholder="Password"></div>
+<div class="row"><button class="btn primary" id="signInEmail">Login ဝင်မယ်</button><button class="btn secondary" id="signUpEmail">အကောင့်အသစ်ဖွင့်မယ်</button></div>
+<div class="msg" id="authMsg" role="status"></div>
+</section>
+<section id="pending" class="card hidden">
+<h2>ခွင့်ပြုချက် စောင့်ဆိုင်းနေသည်</h2><div class="status">သင့်အကောင့်ကို Admin က ခွင့်ပြုမှ စာရင်းအသုံးပြုနိုင်ပါမယ်။</div><p class="note">ဒီစာမျက်နှာမှာ စောင့်ပါ၊ သို့မဟုတ် ပြန်ဝင်ကြည့်ပါ။</p><button class="btn secondary" id="checkApproval">ခွင့်ပြုချက် ပြန်စစ်မယ်</button><button class="btn secondary" id="signOutPending">ထွက်မယ်</button>
+</section>
+<section id="rejected" class="card hidden">
+<h2>ဝင်ခွင့် မပြုထားပါ</h2><p>သင့်အကောင့်ကို Admin က ခွင့်မပြုထားပါ။ လိုအပ်ပါက Admin ကို ဆက်သွယ်ပါ။</p><button class="btn secondary" id="signOutRejected">ထွက်မယ်</button>
+</section>
+<section id="app" class="hidden">
+<div class="card"><div class="row"><div><strong id="welcome">စာရင်းအနှစ်ချုပ်</strong><div class="muted" id="userPhone"></div></div><button class="btn secondary" id="logout">ထွက်မယ်</button></div></div>
+<div id="adminNotice" class="status hidden">Admin Mode — အသုံးပြုသူခွင့်ပြုချက်များကို စီမံနိုင်သည်။</div>
+<section id="adminPanel" class="card hidden"><h2>အသုံးပြုသူများ စီမံရန်</h2><p class="note">Pending အသုံးပြုသူကို ခွင့်ပြု/ပယ်ချနိုင်သည်။</p><div id="usersList" class="tablewrap">ဖတ်နေသည်…</div></section>
+<div class="tabs"><button class="btn primary" data-view="ledger">စာရင်း</button><button class="btn secondary" data-view="report">လစဉ်အနှစ်ချုပ်</button></div>
+<section id="ledgerView">
+<div class="grid card"><div class="metric"><span>ဝင်ငွေ</span><strong class="green" id="sumIn">0 ကျပ်</strong></div><div class="metric"><span>အသုံးစရိတ်</span><strong class="red" id="sumOut">0 ကျပ်</strong></div><div class="metric"><span>လက်ကျန်</span><strong id="sumNet">0 ကျပ်</strong></div></div>
+<div class="card"><h2>စာရင်းအသစ်ထည့်ရန်</h2><form id="entryForm">
+<div class="row"><div class="field"><label for="kind">အမျိုးအစား</label><select id="kind"><option value="income">ဝင်ငွေ</option><option value="expense">အသုံးစရိတ်</option></select></div><div class="field"><label for="entryDate">ရက်စွဲ</label><input id="entryDate" type="date" required></div></div>
+<div class="row"><div class="field"><label for="amount">ငွေပမာဏ (ကျပ်)</label><input id="amount" type="number" min="1" step="1" required placeholder="ဥပမာ 5000"></div><div class="field"><label for="category">အမျိုးအစားခွဲ</label><input id="category" maxlength="50" required placeholder="လစာ / အစားအသောက်"></div></div>
+<div class="field"><label for="memo">မှတ်ချက် (မဖြည့်လည်းရ)</label><input id="memo" maxlength="160" placeholder="မှတ်ချက်"></div><button class="btn primary" type="submit">သိမ်းမယ်</button>
+</form></div>
+<div class="card"><h2>စာရင်းမှတ်တမ်း</h2><div class="row"><div class="field"><label for="monthFilter">လရွေးရန်</label><input type="month" id="monthFilter"></div><div class="field"><label for="typeFilter">အမျိုးအစား</label><select id="typeFilter"><option value="all">အားလုံး</option><option value="income">ဝင်ငွေ</option><option value="expense">အသုံးစရိတ်</option></select></div></div><div id="entriesList" class="tablewrap"></div></div>
+</section>
+<section id="reportView" class="hidden"><div class="card"><h2>လစဉ်အစီရင်ခံစာ</h2><div class="field"><label for="reportMonth">လရွေးရန်</label><input type="month" id="reportMonth"></div><div id="reportBody"></div></div></section>
+</section>
+<div class="note" style="padding:0 4px 20px">လုံခြုံရေး: Database RLS ကာကွယ်မှုနဲ့ Admin approval ကို အသုံးပြုထားရမည်။ Website link ရှိရုံနဲ့ ဝင်ခွင့်မရပါ။</div>
+</main><div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const $=id=>document.getElementById(id);
+const cfgKey='it_supabase_public_config_v1';
+let sb=null, session=null, profile=null, isAdmin=false, entries=[];
+const myMoney=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n)+' ကျပ်';
+const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const monthNow=()=>today().slice(0,7);
+$('entryDate').value=today();$('monthFilter').value=monthNow();$('reportMonth').value=monthNow();
+function show(id,on=true){$(id).classList.toggle('hidden',!on)}
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3000)}
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function message(id,s){$(id).textContent=s}
+function showOnly(which){['setup','auth','pending','rejected','app'].forEach(id=>show(id,id===which))}
+function initClient(url,key){if(!window.supabase){toast('Supabase library မဖွင့်နိုင်ပါ။ အင်တာနက်စစ်ပါ။');return false}try{sb=window.supabase.createClient(url,key);return true}catch(e){toast('Project URL / key မမှန်ပါ။');return false}}
+function loadConfig(){try{return JSON.parse(localStorage.getItem(cfgKey)||'null')}catch(e){return null}}
+function start(){let c=loadConfig();if(!c){showOnly('setup');return}if(!initClient(c.url,c.key)){showOnly('setup');return}showOnly('auth');sb.auth.getSession().then(async({data,error})=>{if(error)return;session=data.session;if(session)await enterApp()});sb.auth.onAuthStateChange((_event,s)=>{session=s;if(!s){profile=null;isAdmin=false;showOnly('auth')}})}
+$('saveConfig').onclick=()=>{const url=$('projectUrl').value.trim().replace(/\/$/,''),key=$('publicKey').value.trim();if(!/^https:\/\/[^ ]+\.supabase\.co$/.test(url)||!key){toast('Project URL နဲ့ public key မှန်ကန်စွာထည့်ပါ။');return}localStorage.setItem(cfgKey,JSON.stringify({url,key}));start()};
+$('clearConfig').onclick=()=>{localStorage.removeItem(cfgKey);$('projectUrl').value='';$('publicKey').value='';showOnly('setup')};
+function emailCredentials(){return {email:$('email').value.trim(),password:$('password').value};}
+$('signInEmail').onclick=async()=>{const{email,password}=emailCredentials();if(!email||!password){message('authMsg','Email နဲ့ Password နှစ်ခုလုံးဖြည့်ပါ။');return}message('authMsg','Login ဝင်နေသည်…');const{data,error}=await sb.auth.signInWithPassword({email,password});if(error){message('authMsg','Login မအောင်မြင်ပါ: '+error.message);return}session=data.session;await enterApp()};
+$('signUpEmail').onclick=async()=>{const{email,password}=emailCredentials();if(!email||!password){message('authMsg','Email နဲ့ Password နှစ်ခုလုံးဖြည့်ပါ။');return}if(password.length<6){message('authMsg','Password ကို အနည်းဆုံး 6 လုံးထားပါ။');return}message('authMsg','အကောင့်ဖွင့်နေသည်…');const{data,error}=await sb.auth.signUp({email,password});if(error){message('authMsg','အကောင့်ဖွင့်မရပါ: '+error.message);return}if(data.session){session=data.session;await enterApp()}else{message('authMsg','အကောင့်ဖွင့်ပြီးပါပြီ။ Email အတည်ပြုရန် Inbox ကိုစစ်ပါ။ အတည်ပြုပြီးမှ Login ဝင်ပါ။')}};
+async function enterApp(){if(!session){showOnly('auth');return}const{data,error}=await sb.from('profiles').select('id,phone,status,role').eq('id',session.user.id).maybeSingle();if(error||!data){showOnly('pending');toast('Profile မဖတ်နိုင်ပါ။ SQL setup ပြီးစီးကြောင်း စစ်ပါ။');return}profile=data;isAdmin=data.role==='admin'&&data.status==='approved';if(data.status==='pending'){showOnly('pending');return}if(data.status==='rejected'){showOnly('rejected');return}if(data.status!=='approved'){showOnly('pending');return}showOnly('app');$('welcome').textContent=isAdmin?'Admin Dashboard':'ဝင်ငွေစာရင်း';$('userPhone').textContent=session.user.email||data.phone||'';show('adminNotice',isAdmin);show('adminPanel',isAdmin);if(isAdmin)await loadUsers();await loadEntries()}
+$('checkApproval').onclick=enterApp;
+$('signOutPending').onclick=()=>sb.auth.signOut();
+$('signOutRejected').onclick=()=>sb.auth.signOut();
+$('logout').onclick=()=>sb.auth.signOut();
+async function loadUsers(){const box=$('usersList');box.textContent='ဖတ်နေသည်…';const{data,error}=await sb.from('profiles').select('id,phone,status,role,created_at').order('created_at',{ascending:false});if(error){box.textContent='အသုံးပြုသူစာရင်း မဖတ်နိုင်ပါ: '+error.message;return}if(!data.length){box.textContent='အသုံးပြုသူမရှိသေးပါ။';return}box.innerHTML=`<table><thead><tr><th>ဖုန်း</th><th>အခြေအနေ</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${data.map(u=>`<tr><td>${safe(u.phone||'—')}${u.id===session.user.id?'<br><span class="small">Admin (မင်း)</span>':''}</td><td><span class="tag ${u.status==='approved'?'ok':u.status==='rejected'?'no':''}">${safe(u.status)}</span></td><td>${u.id===session.user.id?'<span class="small">ကိုယ်ပိုင်အကောင့်</span>':`<div class="row"><button class="btn primary" data-user-action="approved" data-id="${safe(u.id)}">ခွင့်ပြု</button><button class="btn danger" data-user-action="rejected" data-id="${safe(u.id)}">ပယ်ချ</button></div>`}</td></tr>`).join('')}</tbody></table>`}
+$('usersList').addEventListener('click',async e=>{const b=e.target.closest('[data-user-action]');if(!b)return;const{error}=await sb.rpc('admin_set_user_status',{target_user_id:b.dataset.id,new_status:b.dataset.userAction});if(error){toast('ပြောင်းလဲမရပါ: '+error.message);return}toast('ခွင့်ပြုချက် ပြောင်းပြီးပါပြီ။');await loadUsers()});
+async function loadEntries(){const{data,error}=await sb.from('entries').select('id,user_id,entry_date,kind,amount,category,memo,created_at').eq('user_id',session.user.id).order('entry_date',{ascending:false}).order('created_at',{ascending:false});if(error){toast('စာရင်းဖတ်မရပါ: '+error.message);return}entries=data||[];renderEntries();renderSummary();renderReport()}
+$('entryForm').onsubmit=async e=>{e.preventDefault();const amount=Number($('amount').value),date=$('entryDate').value,category=$('category').value.trim();if(!Number.isFinite(amount)||amount<=0||!date||!category){toast('အချက်အလက်တွေ မှန်ကန်စွာဖြည့်ပါ။');return}const{error}=await sb.from('entries').insert({user_id:session.user.id,entry_date:date,kind:$('kind').value,amount,category,memo:$('memo').value.trim()});if(error){toast('မသိမ်းနိုင်ပါ: '+error.message);return}e.target.reset();$('entryDate').value=today();await loadEntries();toast('စာရင်းသိမ်းပြီးပါပြီ။')};
+function filtered(){const m=$('monthFilter').value,t=$('typeFilter').value;return entries.filter(e=>(!m||e.entry_date.startsWith(m))&&(t==='all'||e.kind===t))}
+function renderEntries(){const list=filtered();if(!list.length){$('entriesList').innerHTML='<p class="muted">စာရင်းမရှိသေးပါ။</p>';return}$('entriesList').innerHTML=`<table><thead><tr><th>ရက်စွဲ</th><th>အမျိုးအစား</th><th>မှတ်ချက်</th><th>ငွေပမာဏ</th><th></th></tr></thead><tbody>${list.map(e=>`<tr><td class="nowrap">${safe(e.entry_date)}</td><td><span class="tag ${e.kind==='income'?'ok':'no'}">${e.kind==='income'?'ဝင်ငွေ':'အသုံးစရိတ်'}</span><br>${safe(e.category)}</td><td>${safe(e.memo||'—')}</td><td class="${e.kind==='income'?'green':'red'}">${e.kind==='income'?'+':'−'}${myMoney(+e.amount)}</td><td><button class="btn danger" data-delete-entry="${safe(e.id)}">ဖျက်</button></td></tr>`).join('')}</tbody></table>`}
+$('entriesList').addEventListener('click',async e=>{const b=e.target.closest('[data-delete-entry]');if(!b||!confirm('ဒီစာရင်းကို ဖျက်မှာ သေချာပါသလား။'))return;const{error}=await sb.from('entries').delete().eq('id',b.dataset.deleteEntry).eq('user_id',session.user.id);if(error){toast('ဖျက်မရပါ: '+error.message);return}await loadEntries();toast('ဖျက်ပြီးပါပြီ။')});
+function totals(list){return list.reduce((a,e)=>{a[e.kind]+=(+e.amount||0);return a},{income:0,expense:0})}
+function renderSummary(){const t=totals(entries.filter(e=>e.entry_date.startsWith($('monthFilter').value||monthNow())));$('sumIn').textContent=myMoney(t.income);$('sumOut').textContent=myMoney(t.expense);$('sumNet').textContent=myMoney(t.income-t.expense);$('sumNet').className=(t.income-t.expense<0?'red':'green')}
+function renderReport(){const m=$('reportMonth').value||monthNow(),list=entries.filter(e=>e.entry_date.startsWith(m)),t=totals(list);let cats={};list.forEach(e=>{cats[e.category]??={income:0,expense:0};cats[e.category][e.kind]+=(+e.amount||0)});$('reportBody').innerHTML=`<div class="grid"><div class="metric"><span>ဝင်ငွေ</span><strong class="green">${myMoney(t.income)}</strong></div><div class="metric"><span>အသုံးစရိတ်</span><strong class="red">${myMoney(t.expense)}</strong></div><div class="metric"><span>လက်ကျန်</span><strong>${myMoney(t.income-t.expense)}</strong></div></div><h2 style="margin-top:18px">အမျိုးအစားအလိုက်</h2>${Object.keys(cats).length?`<div class="tablewrap"><table><thead><tr><th>အမျိုးအစား</th><th>ဝင်ငွေ</th><th>အသုံးစရိတ်</th></tr></thead><tbody>${Object.entries(cats).map(([k,v])=>`<tr><td>${safe(k)}</td><td class="green">${myMoney(v.income)}</td><td class="red">${myMoney(v.expense)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">ဒီလအတွက် စာရင်းမရှိသေးပါ။</p>'}<p class="note">လက်ကျန် = ရွေးထားသောလ၏ ဝင်ငွေ − အသုံးစရိတ်။ ယခင်လလက်ကျန် မပါဝင်ပါ။</p>`}
+$('monthFilter').onchange=()=>{renderEntries();renderSummary()};$('typeFilter').onchange=renderEntries;$('reportMonth').onchange=renderReport;
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{show('ledgerView',b.dataset.view==='ledger');show('reportView',b.dataset.view==='report');document.querySelectorAll('[data-view]').forEach(x=>x.className='btn '+(x===b?'primary':'secondary'))});
+start();
+</script>
+</body></html>
